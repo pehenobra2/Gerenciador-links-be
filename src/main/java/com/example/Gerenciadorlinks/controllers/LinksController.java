@@ -59,5 +59,31 @@ public class LinksController {
                 .map(record -> ResponseEntity.ok().body(record))
                 .orElse(ResponseEntity.notFound().build());
     }
+    @PutMapping("/{id}")
+    public ResponseEntity<Link> update(@PathVariable Long id, @RequestBody Link link){
+        return linkRepository.findById(id)
+                .map(record -> {
+                    record.setTitulo(link.getTitulo());
+                    record.setUrl(link.getUrl());
+
+                    Link updated = linkRepository.save(record);
+                    return ResponseEntity.ok().body(updated);
+                })
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id){
+
+        return linkRepository.findById(id)
+                .map(record -> {
+                    linkRepository.deleteById(id);
+                    return ResponseEntity.noContent().<Void>build();
+                })
+                .orElse(ResponseEntity.notFound().build());
+
+
+
+    }
 
 }

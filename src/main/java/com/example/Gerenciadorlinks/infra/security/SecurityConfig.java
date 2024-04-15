@@ -34,6 +34,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/links").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/links").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/links/{id}").permitAll()
+                        .requestMatchers(HttpMethod.PUT, "/api/links/{id}").permitAll()
+                        .requestMatchers(HttpMethod.DELETE, "/api/links/{id}").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class);
