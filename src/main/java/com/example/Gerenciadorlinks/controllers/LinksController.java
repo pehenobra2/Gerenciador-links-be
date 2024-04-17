@@ -1,13 +1,17 @@
 package com.example.Gerenciadorlinks.controllers;
 
-import ch.qos.logback.core.net.SyslogOutputStream;
+import com.example.Gerenciadorlinks.domain.user.User;
 import com.example.Gerenciadorlinks.model.Link;
 import com.example.Gerenciadorlinks.repositories.LinkRepository;
-import lombok.AllArgsConstructor;
+import com.example.Gerenciadorlinks.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+
 
 import java.math.BigInteger;
 import java.security.SecureRandom;
@@ -21,6 +25,7 @@ public class LinksController {
 
 
     private LinkRepository linkRepository;
+    private UserRepository userRepository;
 
     @Autowired
     public LinksController(LinkRepository linkRepository) {
@@ -34,16 +39,34 @@ public class LinksController {
 
     @PostMapping
     public ResponseEntity<Link> create(@RequestBody Link link){
+
+
+
         link.setSufixo(gerarSufixo(8));
         link.setDataCriada(LocalDateTime.now().format(formatter));
 
-        System.out.println(link.getTitulo());
-        System.out.println(link.getId());
-        System.out.println(link.getUrl());
-        System.out.println(link.getSufixo());
-        System.out.println(link.getDataCriada());
+        String userId = getUserIdFromContext();
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with ID: " + userId));
+
+        link.setUser(user);
+
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(linkRepository.save(link));
+
+    }
+
+    private String getUserIdFromContext() {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (principal instanceof UserDetails) {
+            UserDetails userDetails = (UserDetails) principal;
+            return userRepository.findByName(userDetails.getUsername())
+                    .map(User::getId)
+                    .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + userDetails.getUsername()));
+        } else {
+            throw new IllegalStateException("Cannot get user ID from non-UserDetails principal");
+        }
     }
 
 
