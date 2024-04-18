@@ -42,10 +42,13 @@ public class LinksController {
     }
 
     @PostMapping
-    public ResponseEntity<Link> create(@RequestBody Link link){
+    public ResponseEntity<Link> create(){
 
+        Link link = new Link();
 
         String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        System.out.println("Email: " + userEmail);
 
         Optional<User> userOptional = userRepository.findByEmail(userEmail);
 
@@ -56,8 +59,9 @@ public class LinksController {
             link.setUser(user);
             link.setSufixo(gerarSufixo(10));
             link.setDataCriada(LocalDateTime.now().format(formatter));
+            linkRepository.saveAndFlush(link);
             return ResponseEntity.status(HttpStatus.CREATED)
-                    .body(linkRepository.save(link));
+                    .body(link);
         }else{
             throw new UsernameNotFoundException("User not found");
         }

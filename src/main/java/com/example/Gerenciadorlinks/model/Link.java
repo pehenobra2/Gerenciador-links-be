@@ -2,16 +2,18 @@ package com.example.Gerenciadorlinks.model;
 
 
 import com.example.Gerenciadorlinks.domain.user.User;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Getter
 @Setter
 @Entity
-public class Link {
+public class Link implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -26,8 +28,9 @@ public class Link {
 
     private String dataCriada;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="user_id")
     private User user;
+
 
 }

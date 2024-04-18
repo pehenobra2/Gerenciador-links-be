@@ -1,5 +1,6 @@
 services:
-  mysql:
+  link_mysql_pedro:
+    container_name: link_mysql_pedro
     image: 'mysql:latest'
     environment:
       - 'MYSQL_DATABASE=mydatabase'
@@ -7,6 +8,6 @@ services:
       - 'MYSQL_ROOT_PASSWORD=verysecret'
       - 'MYSQL_USER=myuser'
     expose:
-      - '3306'
+      - '5803'
     ports:
-      - '3306:3306'
+      - '5803:3306'
