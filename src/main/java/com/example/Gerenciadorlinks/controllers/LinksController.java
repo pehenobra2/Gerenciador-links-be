@@ -7,6 +7,8 @@ import com.example.Gerenciadorlinks.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -18,6 +20,7 @@ import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/links")
@@ -28,8 +31,9 @@ public class LinksController {
     private UserRepository userRepository;
 
     @Autowired
-    public LinksController(LinkRepository linkRepository) {
+    public LinksController(LinkRepository linkRepository, UserRepository userRepository) {
         this.linkRepository = linkRepository;
+        this.userRepository = userRepository;
     }
 
     @GetMapping
@@ -41,33 +45,25 @@ public class LinksController {
     public ResponseEntity<Link> create(@RequestBody Link link){
 
 
+        String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
 
-        link.setSufixo(gerarSufixo(8));
-        link.setDataCriada(LocalDateTime.now().format(formatter));
+        Optional<User> userOptional = userRepository.findByEmail(userEmail);
 
-        String userId = getUserIdFromContext();
+        if(userOptional.isPresent()){
+            User user = userOptional.get();
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found with ID: " + userId));
 
-        link.setUser(user);
-
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(linkRepository.save(link));
-
-    }
-
-    private String getUserIdFromContext() {
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (principal instanceof UserDetails) {
-            UserDetails userDetails = (UserDetails) principal;
-            return userRepository.findByName(userDetails.getUsername())
-                    .map(User::getId)
-                    .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + userDetails.getUsername()));
-        } else {
-            throw new IllegalStateException("Cannot get user ID from non-UserDetails principal");
+            link.setUser(user);
+            link.setSufixo(gerarSufixo(10));
+            link.setDataCriada(LocalDateTime.now().format(formatter));
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body(linkRepository.save(link));
+        }else{
+            throw new UsernameNotFoundException("User not found");
         }
+
     }
+
 
 
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yy");
