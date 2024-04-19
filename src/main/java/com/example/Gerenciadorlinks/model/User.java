@@ -1,4 +1,4 @@
-package com.example.Gerenciadorlinks.domain.user;
+package com.example.Gerenciadorlinks.model;
 
 import com.example.Gerenciadorlinks.model.Link;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -10,6 +10,7 @@ import lombok.Setter;
 import org.hibernate.annotations.LazyCollection;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -31,8 +32,8 @@ public class User implements Serializable {
     private String password;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "user", fetch=FetchType.LAZY)
-    private List<Link> links;
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "user", fetch=FetchType.LAZY)
+    private List<Link> links = new ArrayList<>();
 
     @Override
     public String toString() {

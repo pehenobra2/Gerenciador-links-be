@@ -2,7 +2,7 @@ package com.example.Gerenciadorlinks.repositories;
 
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import com.example.Gerenciadorlinks.domain.user.User;
+import com.example.Gerenciadorlinks.model.User;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 

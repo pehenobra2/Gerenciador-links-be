@@ -1,14 +1,12 @@
 package com.example.Gerenciadorlinks.model;
 
 
-import com.example.Gerenciadorlinks.domain.user.User;
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.antlr.v4.runtime.misc.NotNull;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -16,11 +14,15 @@ import java.time.LocalDateTime;
 public class Link implements Serializable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private String id;
 
+    @NotNull
+    @Column(length = 100, nullable = false)
     private String titulo;
 
+    @NotNull
+    @Column(length = 200, nullable = false)
     private String url;
 
     @Column(unique = true)
@@ -28,7 +30,7 @@ public class Link implements Serializable {
 
     private String dataCriada;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name="user_id")
     private User user;
 

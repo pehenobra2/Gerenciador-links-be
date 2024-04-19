@@ -1,6 +1,6 @@
 package com.example.Gerenciadorlinks.infra.security;
 
-import com.example.Gerenciadorlinks.domain.user.User;
+import com.example.Gerenciadorlinks.model.User;
 import com.example.Gerenciadorlinks.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
